@@ -1,3 +1,4 @@
+
 /**
  * File information:
  * 
@@ -11,7 +12,6 @@
 Copyright Avetharun 2021 - GNU-GPL3-a
 
 Let's keep this simple. It follows the GNU GPL3 license, with very few modifications and exceptions.
-
 
 You can:
   - Use this commercially
@@ -73,10 +73,13 @@ typedef struct s_bloc
 #define __HEADER_SIZE__ sizeof(struct s_bloc)
 #define __ALIGN_ADDR__(size, power) (((size - 1) / power + 1) * power)
 
-
+// Allocate <size> bytes of memory
 extern void * malloc( size_t size );
+// Free malloc()'d object. If it isn't from malloc(), it'll just not do anything. Make sure to free things manually in that case!
 extern void   free(void *);
+// Same as malloc() but for an array. calloc(members, size_of_each_member);
 extern void * calloc(size_t num_members, size_t size);
+// Re-allocate memory to another size. 
 extern void * realloc(void * ptr, size_t size);
 // Copy N bytes from src into dest
 extern void memcpy (void* dest, void* src, size_t n);

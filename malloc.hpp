@@ -1,3 +1,5 @@
+
+#if !defined(clearos_os_cstd_malloc_hpp_headeronly)
 /**
  * File information:
  * 
@@ -42,8 +44,7 @@ Limitations / What you cannot do
  */
 
 
-#if !defined(clearos_os_cstd_malloc_hpp)
-#define clearos_os_cstd_alloc_h__
+#define clearos_os_cstd_malloc_hpp_headeronly
 #if (!defined(size_t) || defined(NEED_SIZE_T)) && !defined(DONT_NEED_SIZE_T)
 typedef unsigned long size_t;
 #endif
@@ -86,7 +87,7 @@ int __get_pagesize_() { return __internal_page_size; }
 void __set_pagesize_(int size) { __internal_page_size = size; }
 
 // Increase data space by <increment> bytes. 
-// Pass 0 through this function to get current limit
+// Pass 0 through this function to get pointer to the current upper-bound
 void* sbrk(int incrememt) {
     if (incrememt > 0) { __internal_brk += incrememt; }
     return __internal_brk; 
@@ -127,7 +128,11 @@ void create_rest_bloc(m_bloc *bloc, size_t size, int pagesize) {
     if (bloc == nullptr) { return; }
     bloc->next = rest;
 }
+
+// This is here just so we have a reference to the first block of memory.. since the OS will have a panic if it doesn't have an instance.
+// Or at least it did on my hardware.
 m_bloc __dummy_block = m_bloc(16);
+
 m_bloc * create_dummy_bloc() {
     sbrk(64);
     m_bloc	*rest = &__dummy_block;
@@ -188,24 +193,6 @@ int split_bloc(m_bloc * this_bloc, size_t size) {
     return (0);
 }
 
-m_bloc * fusion_free_bloc(m_bloc *bloc) {
-    m_bloc	*tmp;
-  
-    tmp = bloc;
-    if (bloc->prev != nullptr && bloc->prev->isFree == true) {
-        bloc->prev->next = bloc->next;
-        bloc->next->prev = bloc->prev;
-        bloc->size += bloc->prev->size + __HEADER_SIZE__;
-        tmp = bloc->prev;
-    }
-    if (tmp->next != nullptr && tmp->next->isFree == true) {
-        tmp->size += tmp->next->size + __HEADER_SIZE__;
-        tmp->next = tmp->next->next;
-    }
-    return (tmp);
-}
-
-
 
 // Allocate <size> memory in bytes
 void * malloc( size_t size ) {
@@ -257,4 +244,4 @@ void memset(void* src, int v, size_t n) {
 }
 
 
-#endif // clearos_os_cstd_alloc_h__
+#endif // clearos_os_cstd_malloc_hpp_headeronly
